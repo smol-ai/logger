@@ -155,6 +155,18 @@ await logger.asyncLog('my message here', { foo: 'bar' })
 
 </details>
 
+## Intercept input vs output
+
+This logs BOTH input and output of a function that you want to monitor.
+
+```js
+const interceptedFn = logger.intercept(openai.createChatCompletion)
+const response = await interceptedFn({
+        model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
+        messages: [/* etc */ ],
+    });
+```
+
 ## Customize everything else
 
 General rule for customizing is just overwrite any of the variables and methods exposed in the class:

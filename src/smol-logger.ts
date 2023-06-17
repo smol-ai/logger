@@ -69,6 +69,23 @@ export class SmolLogger {
     if (this.logToStore) await this.store(this._log(name, args))
     return args
   }
+
+  // todo: improve the typing on this, please help
+  intercept = (interceptedFn: Function) => async (...args: any[]) => {
+    let result = 'NO RESULT'
+    try {
+      result = await interceptedFn(...args)
+    } catch (err) {
+      throw err
+    } finally {
+      await this.asyncLog(interceptedFn.name, {
+        args,
+        result
+      })
+      return result 
+    }
+  }
+
 }
 
 function getCurrentFilePath() {

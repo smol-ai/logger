@@ -166,24 +166,6 @@ logger.logToConsole = false // turn off logging to terminal
 logger.logToStore = false // turn off logging to store
 
 logger.logName = (name: string) => `My custom logName: ${name}` // change Log naming!
-// for example, you can add log names in a stack
-const logStack = [logger.logName] // store original logName fn at the bottom of the stack
-logger.logName = (name: string) => logStack.reduce(x => x, name)
-do {
-  logStack.push(name => '>' + name)
-  // everything logged here is one '>' indent in
-  do {
-    logStack.push(name => '>' + name)
-    // everything logged here is two '>>' indent in
-    do {
-      logStack.push(name => '>' + name)
-      // everything logged here is three '>>>' indent in
-      logStack.pop()
-    } while (someVar1)
-    logStack.pop()
-  } while (someVar2)
-  logStack.pop()
-} while (someVar3)
 
 logger.LOGCOLOR = (logName: string) => "\x1b[35m" + logName + "\x1b[0m"; // set log colors to magenta instead of yellow
 ```
@@ -199,6 +181,33 @@ Other log colors to try:
 \x1b[36m: Cyan
 \x1b[37m: White
 ```
+
+Get creative! For example you can stack logname functions...
+
+```js
+// for an advanced application, you can add log names in a stack
+const logStack = [logger.logName] // store original logName fn at the bottom of the stack
+logger.logName = (name) => logStack.reduce((prev, fn) => fn(prev), name)
+let temp = 0
+do {
+  logStack.unshift(name => '   ' + name)
+  // everything logged here is one indent in
+  log('logname1 here ' + temp, temp)
+    let temp2 = 0
+    do {
+      logStack.unshift(name => '   ' + name)
+      // everything logged here is two indent in
+      log('logname2 here ' + temp, temp)
+      logStack.shift()
+    } while (temp2++ < 5)
+  logStack.shift()
+} while (temp++ < 5)
+```
+
+<img height="400" alt="image" src="https://github.com/smol-ai/logger/assets/6764957/2f15bf5a-a25b-4b69-b7e5-38524beeef70">
+
+
+
 
 ## Contributor notes
 

@@ -171,7 +171,7 @@ const response = await interceptedFn({
 
 General rule for customizing is just overwrite any of the variables and methods exposed in the class:
 
-```js
+```ts
 logger.logDirectory = '.smol-logs' // change default file store directory
 
 logger.logToConsole = false // turn off logging to terminal
@@ -193,6 +193,33 @@ Other log colors to try:
 \x1b[36m: Cyan
 \x1b[37m: White
 ```
+
+Get creative! For example you can stack logname functions...
+
+```js
+// for an advanced application, you can add log names in a stack
+const logStack = [logger.logName] // store original logName fn at the bottom of the stack
+logger.logName = (name) => logStack.reduce((prev, fn) => fn(prev), name)
+let temp = 0
+do {
+  logStack.unshift(name => '   ' + name)
+  // everything logged here is one indent in
+  log('logname1 here ' + temp, temp)
+    let temp2 = 0
+    do {
+      logStack.unshift(name => '   ' + name)
+      // everything logged here is two indent in
+      log('logname2 here ' + temp, temp)
+      logStack.shift()
+    } while (temp2++ < 5)
+  logStack.shift()
+} while (temp++ < 5)
+```
+
+<img height="400" alt="image" src="https://github.com/smol-ai/logger/assets/6764957/2f15bf5a-a25b-4b69-b7e5-38524beeef70">
+
+
+
 
 ## Contributor notes
 

@@ -175,7 +175,7 @@ const wrapped = logger.intercept(
   openai.createChatCompletion.bind(openai),  // binding is impt bc of how OpenAI internally retrieves its config
   {
     logTransformer: (args, result) => ({
-      ...result, // optional - if you want the full raw result itself
+      // ...result, // optional - if you want the full raw result itself
       prompt: args[0].messages,
       response: result.data.choices[0].message,
     })

@@ -171,8 +171,6 @@ Sometimes the output can be very verbose (as is the case with OpenAI chatComplet
 
 ```js
 // custom 
-logger.logTransformer = 
-
 const wrapped = logger.intercept(
   openai.createChatCompletion.bind(openai),  // binding is impt bc of how OpenAI internally retrieves its config
   {
@@ -190,7 +188,10 @@ const response = await wrapped({
 // now the logged response has highlighted the specific fields of our interest
 ```
 
-This is synchronous; no async functionality enabled yet
+<img height="400" alt="image" src="https://github.com/smol-ai/logger/assets/6764957/0b15a508-db3b-4a52-8a8f-a94a7e0282a6">
+
+
+The `logTransformer` function can be async in case you need it.
 
 ## Customize everything else
 

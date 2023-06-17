@@ -31,7 +31,7 @@ npm install @smol-ai/logger
 use:
 
 ```js
-import { SmolLogger } from './logger.mjs';
+import { SmolLogger } from '@smol-ai/logger';
 
 const logger = new SmolLogger(true)
 const log = logger.log

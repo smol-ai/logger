@@ -181,7 +181,7 @@ Other log colors to try:
 
 ## Contributor notes
 
-this repo was bootstrapped with https://github.com/alexjoverm/typescript-library-starter
+this repo was bootstrapped with https://github.com/alexjoverm/typescript-library-starter (must modify with https://github.com/alexjoverm/typescript-library-starter/issues/333)
 
 
 #### Publishing

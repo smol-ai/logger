@@ -1,7 +1,13 @@
 import fs from 'fs';
 import path from 'path';
 
-
+type Store = ({ logName, loggedLine, payload, secondsSinceStart, secondsSinceLastLog }: {
+  logName: string;
+  loggedLine: string | null;
+  payload: any;
+  secondsSinceStart: number;
+  secondsSinceLastLog: number;
+}) => any
 export class SmolLogger {
   counter = 0;
   startTime = Date.now();
@@ -30,7 +36,7 @@ export class SmolLogger {
   }
 
   // default implementation of store that just writes to a file. overwrite to log to somewhere else
-  store = ({ logName, loggedLine, payload, secondsSinceStart, secondsSinceLastLog }: 
+  store: Store = ({ logName, loggedLine, payload, secondsSinceStart, secondsSinceLastLog }: 
     { logName: string, loggedLine: string | null, payload: any, secondsSinceStart: number, secondsSinceLastLog: number }
   ) => {
     const destination = path.join(this.currentRunDir, `${logName}.json`)

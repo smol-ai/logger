@@ -42,7 +42,7 @@ export class SmolLogger {
     );
   }
 
-  log = (name: string, args: any) => { // arrow fn or else this.* references wont work when called from other files
+  private _log = (name: string, args: any) => { // arrow fn or else this.* references wont work when called from other files
     const logName = this.logName(name)
     const loggedLine = getCurrentFilePath();
     const currentTime = Date.now();
@@ -53,15 +53,14 @@ export class SmolLogger {
       console.log(this.LOGCOLOR(logName), loggedLine, this.LOGCOLOR("with"), secondsSinceStart.toFixed(2), this.LOGCOLOR("seconds elapsed"));
       console.log(this.LOGCOLOR(logName), args);
     }
-    if (this.logToStore) {
-      this.store({
-        logName, 
-        loggedLine,
-        secondsSinceStart,
-        secondsSinceLastLog,
-        payload: args
-      })
-    }
+    return { logName, loggedLine,secondsSinceStart,secondsSinceLastLog, payload: args }
+  }
+  log = (name: string, args: any) => {
+    if (this.logToStore) this.store(this._log(name, args))
+    return args
+  }
+  asyncLog = async (name: string, args: any) => {
+    if (this.logToStore) await this.store(this._log(name, args))
     return args
   }
 }

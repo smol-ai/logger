@@ -1,6 +1,6 @@
 # smol logger
 
-A zero dependency, <100LOC Node.js extensible logging tool that **uses the filesystem as Log UI**.
+An extensible, fast logging tool that **uses the filesystem as Log UI**.
 
 <img height="400" alt="image" src="https://github.com/smol-ai/logger/assets/6764957/a862f61d-9459-42d2-bab7-572231c5c8e8">
 
@@ -8,8 +8,11 @@ A zero dependency, <100LOC Node.js extensible logging tool that **uses the files
 
 - Logs to both the console and local json files for easy navigation/versioning
 - Logs time elapsed, filepath/line number of log call
-- Extend the log store to a remote store, e.g. LogFlare
-- Customize everything from naming to terminal log color
+- Extensible
+  - Extend the log store to a remote store, e.g. LogFlare
+  - Customize everything from naming to terminal log color
+- Zero dependency, <100 LOC
+- (todo) tested thanks to [Codium AI](https://www.latent.space/p/codium-agents)
 
 Non-goals:
 
@@ -116,6 +119,71 @@ const sendToLogFlare = ({ logName, loggedLine, payload, secondsSinceStart, secon
 log.store = throttle(sendToLogFlare, 1000)
 ```
 
+<details>
+<summary>
+Async/Blocking logging
+</summary>
+
+Logging is synchronous by default in smol logger.
+
+Note that in the above example we are firing off an async fetch inside of a synchronous call. If your application crashes there is a smol chance that the log may not complete sending since it is running asynchronously. If you need to block for an async call, you can overwrite the `asyncLog` method:
+
+```js
+// OPTIONAL: store the local file store for reuse
+const oldStore = logger.store
+
+// override the default local file store with your own remote filestore
+// { logName: string, loggedLine: string | null, payload: any, secondsSinceStart: number, secondsSinceLastLog: number }
+logger.store = async ({ logName, loggedLine, payload, secondsSinceStart, secondsSinceLastLog }) => {
+  const res = await fetch("https://api.logflare.app/logs/json?source=YOUR_SOURCE_ID", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      "X-API-KEY": "YOUR_API_KEY_HERE"
+    },
+    body: JSON.stringify({ message: logName, metadata: {loggedLine, payload, secondsSinceStart, secondsSinceLastLog }})
+  }).then(res => res.json())
+  // just demonstrating that you can await inside this store
+}
+
+// now you can block execution in an async context
+await logger.asyncLog('my message here', { foo: 'bar' })
+```
+
+</details>
+
+## Customize everything else
+
+General rule for customizing is just overwrite any of the variables and methods exposed in the class:
+
+```js
+logger.logDirectory = '.smol-logs' // change default file store directory
+
+logger.logToConsole = false // turn off logging to terminal
+logger.logToStore = false // turn off logging to store
+
+logger.logName = (name: string) => `My custom logName: ${name}` // change Log naming!
+
+logger.LOGCOLOR = (logName: string) => "\x1b[35m" + logName + "\x1b[0m"; // set log colors to magenta instead of yellow
+```
+
+Other log colors to try:
+
+```
+\x1b[31m: Red
+\x1b[32m: Green
+\x1b[33m: Yellow
+\x1b[34m: Blue
+\x1b[35m: Magenta
+\x1b[36m: Cyan
+\x1b[37m: White
+```
+
+## Contributor notes
+
+this repo was bootstrapped with https://github.com/alexjoverm/typescript-library-starter
+
+
 #### Publishing
 
 Follow the console instructions to install semantic release and run it (answer NO to "Do you want a `.travis.yml` file with semantic-release setup?").
@@ -132,6 +200,3 @@ From now on, you'll need to use `npm run commit`, which is a convenient way to c
 
 Automatic releases are possible thanks to [semantic release](https://github.com/semantic-release/semantic-release), which publishes your code automatically on [github](https://github.com/) and [npm](https://www.npmjs.com/), plus generates automatically a changelog. This setup is highly influenced by [Kent C. Dodds course on egghead.io](https://egghead.io/courses/how-to-write-an-open-source-javascript-library)
 
-## acknowledgements
-
-bootstrapped with https://github.com/alexjoverm/typescript-library-starter

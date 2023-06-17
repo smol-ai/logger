@@ -58,7 +58,7 @@ We default to [single arity to encourage this in the JS ecosystem](https://www.f
 
 ## Extend to Remote Storage
 
-We like logflare!
+We like [Logflare](https://logflare.app/)!
 
 ```js
 // { logName: string, loggedLine: string | null, payload: any, secondsSinceStart: number, secondsSinceLastLog: number }
@@ -73,6 +73,9 @@ logger.store = ({ logName, loggedLine, payload, secondsSinceStart, secondsSinceL
   })
 }
 ```
+
+<img height="300" alt="image" src="https://github.com/smol-ai/logger/assets/6764957/69b546ec-23d7-4099-9432-5fd37ca1436e">
+
 
 #### Publishing
 

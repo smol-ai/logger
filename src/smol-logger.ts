@@ -77,16 +77,16 @@ export class SmolLogger {
     opts: { logTransformer: any}  // todo: improve the typing on this, please help
     ) => async (...args: any[]) => {
     let result = 'NO RESULT'
-    opts.logTransformer = opts.logTransformer ?? ((result: any) => result)
+    opts.logTransformer = opts.logTransformer ?? ((args: any, result: any) => result)
     try {
       result = await interceptedFn(...args)
+      result = await opts.logTransformer(args, result)
     } catch (err) {
       throw err
     } finally {
-      let transformedResult = await opts.logTransformer(result)
       await this.asyncLog(interceptedFn.name, {
         args,
-        transformedResult
+        result
       })
       return result 
     }

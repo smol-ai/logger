@@ -175,11 +175,13 @@ logger.logTransformer =
 
 const wrapped = logger.intercept(
   openai.createChatCompletion.bind(openai),  // binding is impt bc of how OpenAI internally retrieves its config
-  payload => ({
-    ...payload, // optional - if you want the full raw payload itself
-    prompt: payload.args[0].messages,
-    response: payload.result.data.choices[0].message,
-  })
+  {
+    logTransformer: (args, result) => ({
+      ...result, // optional - if you want the full raw result itself
+      prompt: args[0].messages,
+      response: result.data.choices[0].message,
+    })
+  }
 )
 const response = await wrapped({
         model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',

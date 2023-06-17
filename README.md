@@ -1,6 +1,8 @@
 # smol logger
 
-A zero dependency Node.js extensible logging tool.
+A zero dependency, <100LOC Node.js extensible logging tool that **uses the filesystem as Log UI**.
+
+<img height="400" alt="image" src="https://github.com/smol-ai/logger/assets/6764957/a862f61d-9459-42d2-bab7-572231c5c8e8">
 
 ## Features
 

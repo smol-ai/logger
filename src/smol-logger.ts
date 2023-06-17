@@ -36,7 +36,7 @@ export class SmolLogger {
   }
 
   // default implementation of store that just writes to a file. overwrite to log to somewhere else
-  store: Store = ({ logName, loggedLine, payload, secondsSinceStart, secondsSinceLastLog }: 
+  store: Store = ({ logName, loggedLine, payload, secondsSinceStart, secondsSinceLastLog, ...args }: 
     { logName: string, loggedLine: string | null, payload: any, secondsSinceStart: number, secondsSinceLastLog: number }
   ) => {
     const destination = path.join(this.currentRunDir, `${logName}.json`)
@@ -44,7 +44,9 @@ export class SmolLogger {
     const p = loggedLine ? loggedLine.split(':') : ['UNKNOWN', 'UNKNOWN', 'UNKNOWN']
     fs.writeFileSync(
       destination,
-      JSON.stringify({ path: p[0] + ':' + p[1], location: p[2], secondsSinceStart, secondsSinceLastLog, payload }, null, 2)
+      JSON.stringify(
+        { path: p[0] + ':' + p[1], location: p[2], secondsSinceStart, secondsSinceLastLog, payload, ...args }, 
+        getCircularReplacer(), 2)
     );
   }
 
@@ -70,17 +72,21 @@ export class SmolLogger {
     return args
   }
 
-  // todo: improve the typing on this, please help
-  intercept = (interceptedFn: Function) => async (...args: any[]) => {
+  intercept = (
+    interceptedFn: Function, // todo: improve the typing on this, please help
+    opts: { logTransformer: any}  // todo: improve the typing on this, please help
+    ) => async (...args: any[]) => {
     let result = 'NO RESULT'
+    opts.logTransformer = opts.logTransformer ?? ((result: any) => result)
     try {
       result = await interceptedFn(...args)
     } catch (err) {
       throw err
     } finally {
+      let transformedResult = await opts.logTransformer(result)
       await this.asyncLog(interceptedFn.name, {
         args,
-        result
+        transformedResult
       })
       return result 
     }
@@ -109,6 +115,20 @@ function pad(num: number, size = 2) {
   let s = num + "";
   while (s.length < size) s = "0" + s;
   return s;
+}
+
+
+function getCircularReplacer() {
+  const seen = new WeakSet();
+  return (key: any, value: any) => {
+    if (typeof value === "object" && value !== null) {
+      if (seen.has(value)) {
+        return;
+      }
+      seen.add(value);
+    }
+    return value;
+  };
 }
 
 export default SmolLogger;

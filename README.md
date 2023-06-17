@@ -155,17 +155,40 @@ await logger.asyncLog('my message here', { foo: 'bar' })
 
 </details>
 
-## Intercept input vs output
+## Advanced: Intercept input vs output
 
 This logs BOTH input and output of a function that you want to monitor.
 
 ```js
-const interceptedFn = logger.intercept(openai.createChatCompletion)
-const response = await interceptedFn({
+const wrapped = logger.intercept(openai.createChatCompletion.bind(openai)) // binding is impt bc of how OpenAI internally retrieves its config
+const response = await wrapped({
         model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
         messages: [/* etc */ ],
     });
 ```
+
+Sometimes the output can be very verbose (as is the case with OpenAI chatCompletion). so we also allow you to expose a simple "log transformer" that is an arbitrary function to modify the intercepted output to a format of your choice that you like:
+
+```js
+// custom 
+logger.logTransformer = 
+
+const wrapped = logger.intercept(
+  openai.createChatCompletion.bind(openai),  // binding is impt bc of how OpenAI internally retrieves its config
+  payload => ({
+    ...payload, // optional - if you want the full raw payload itself
+    prompt: payload.args[0].messages,
+    response: payload.result.data.choices[0].message,
+  })
+)
+const response = await wrapped({
+        model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
+        messages: [/* etc */ ],
+    });
+// now the logged response has highlighted the specific fields of our interest
+```
+
+This is synchronous; no async functionality enabled yet
 
 ## Customize everything else
 

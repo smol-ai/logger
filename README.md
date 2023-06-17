@@ -178,7 +178,9 @@ do {
     do {
       logStack.push(name => '>' + name)
       // everything logged here is three '>>>' indent in
+      logStack.pop()
     } while (someVar1)
+    logStack.pop()
   } while (someVar2)
   logStack.pop()
 } while (someVar3)

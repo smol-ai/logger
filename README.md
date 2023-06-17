@@ -159,13 +159,29 @@ await logger.asyncLog('my message here', { foo: 'bar' })
 
 General rule for customizing is just overwrite any of the variables and methods exposed in the class:
 
-```js
+```ts
 logger.logDirectory = '.smol-logs' // change default file store directory
 
 logger.logToConsole = false // turn off logging to terminal
 logger.logToStore = false // turn off logging to store
 
 logger.logName = (name: string) => `My custom logName: ${name}` // change Log naming!
+// for example, you can add log names in a stack
+const logStack = [logger.logName] // store original logName fn at the bottom of the stack
+logger.logName = (name: string) => logStack.reduce(x => x, name)
+do {
+  logStack.push(name => '>' + name)
+  // everything logged here is one '>' indent in
+  do {
+    logStack.push(name => '>' + name)
+    // everything logged here is two '>>' indent in
+    do {
+      logStack.push(name => '>' + name)
+      // everything logged here is three '>>>' indent in
+    } while (someVar1)
+  } while (someVar2)
+  logStack.pop()
+} while (someVar3)
 
 logger.LOGCOLOR = (logName: string) => "\x1b[35m" + logName + "\x1b[0m"; // set log colors to magenta instead of yellow
 ```

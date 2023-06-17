@@ -58,9 +58,13 @@ We default to [single arity to encourage this in the JS ecosystem](https://www.f
 
 ## Extend to Remote Storage
 
-We like [Logflare](https://logflare.app/)!
+For production logging, Smol Logger's storage destination can be overwritten. We like [Logflare](https://logflare.app/)!
 
 ```js
+// OPTIONAL: store the local file store for reuse
+const oldStore = logger.store
+
+// override the default local file store with your own remote filestore
 // { logName: string, loggedLine: string | null, payload: any, secondsSinceStart: number, secondsSinceLastLog: number }
 logger.store = ({ logName, loggedLine, payload, secondsSinceStart, secondsSinceLastLog }) => {
   fetch("https://api.logflare.app/logs/json?source=YOUR_SOURCE_ID", {
@@ -69,13 +73,46 @@ logger.store = ({ logName, loggedLine, payload, secondsSinceStart, secondsSinceL
       "Content-Type": "application/json; charset=utf-8",
       "X-API-KEY": "YOUR_API_KEY_HERE"
     },
-    body: JSON.stringify({ logName, loggedLine, payload, secondsSinceStart, secondsSinceLastLog })
+    body: JSON.stringify({ message: logName, metadata: {loggedLine, payload, secondsSinceStart, secondsSinceLastLog }})
   })
+  // OPTIONAL: run the local file store as well
+  oldStore({ logName, loggedLine, payload, secondsSinceStart, secondsSinceLastLog })
 }
 ```
 
 <img height="300" alt="image" src="https://github.com/smol-ai/logger/assets/6764957/69b546ec-23d7-4099-9432-5fd37ca1436e">
 
+If you expect high volumes of logs, you should batch them:
+
+```js
+const logMessages = []
+
+function throttle(func, delay = 1000) {
+  let timeout = null;
+  return function(...args) {
+    if (!timeout) {
+      timeout = setTimeout(() => {
+        func.call(this, ...args);
+        timeout = null;
+      }, delay);
+    }
+  };
+}
+
+const sendToLogFlare = ({ logName, loggedLine, payload, secondsSinceStart, secondsSinceLastLog }) => {
+  fetch("https://api.logflare.app/logs/json?source=YOUR_SOURCE_ID", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      "X-API-KEY": "YOUR_API_KEY"
+    },
+    body: JSON.stringify({"batch": logMessages})
+  })
+  .then(() => logMessages = [])
+}
+
+log.store = throttle(sendToLogFlare, 1000)
+```
 
 #### Publishing
 

@@ -56,6 +56,24 @@ mySingleArityFunction(log({foo, bar, baz}) // log them all why not
 
 We default to [single arity to encourage this in the JS ecosystem](https://www.freecodecamp.org/news/how-to-optimize-for-change-software-development/).
 
+## Extend to Remote Storage
+
+We like logflare!
+
+```js
+// { logName: string, loggedLine: string | null, payload: any, secondsSinceStart: number, secondsSinceLastLog: number }
+logger.store = ({ logName, loggedLine, payload, secondsSinceStart, secondsSinceLastLog }) => {
+  fetch("https://api.logflare.app/logs/json?source=YOUR_SOURCE_ID", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      "X-API-KEY": "YOUR_API_KEY_HERE"
+    },
+    body: JSON.stringify({ logName, loggedLine, payload, secondsSinceStart, secondsSinceLastLog })
+  })
+}
+```
+
 #### Publishing
 
 Follow the console instructions to install semantic release and run it (answer NO to "Do you want a `.travis.yml` file with semantic-release setup?").

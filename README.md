@@ -33,6 +33,15 @@ const log = logger.log
 log('name of log (required)', payload) // basic usage
 ```
 
+All logs are sent to the console and file system by default, so you can easily navigate in your IDE:
+
+<img width="1462" alt="image" src="https://github.com/smol-ai/logger/assets/6764957/348a3f49-1022-4763-9b63-cf0e3080b85a">
+
+The logs look like this!
+
+<img width="1470" alt="image" src="https://github.com/smol-ai/logger/assets/6764957/a862f61d-9459-42d2-bab7-572231c5c8e8">
+
+
 The `log` function is a single arity "identity function" - returns the payload so you can modify in place.
 
 ```js

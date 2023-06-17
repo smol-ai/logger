@@ -47,11 +47,11 @@ The `log` function is a single arity "identity function" - returns the payload s
 ```js
 mySuperAwesomeFunction(foo, bar, baz) // oh no i need to log bar
 mySuperAwesomeFunction(foo, log(bar), baz) // done!
-mySuperAwesomeFunction(...log({foo, bar, baz}).values()) // done!
+mySuperAwesomeFunction(...log({foo, bar, baz}).values()) // log them all why not
 
 mySingleArityFunction({foo, bar, baz}) // oh no i need to log bar and baz
 mySingleArityFunction({foo, ...log({bar, baz})) // done!
-mySingleArityFunction(log({foo, bar, baz}) // log them all why not
+mySingleArityFunction(log({foo, bar, baz})) // log them all why not
 ```
 
 We default to [single arity to encourage this in the JS ecosystem](https://www.freecodecamp.org/news/how-to-optimize-for-change-software-development/).

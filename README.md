@@ -12,6 +12,7 @@ An extensible, fast logging tool that **uses the filesystem as Log UI**.
   - Extend the log store to a remote store, e.g. LogFlare
   - Customize everything from naming to terminal log color
 - Zero dependency, <100 LOC
+- MIT Open Source: https://github.com/smol-ai/logger
 - (todo) tested thanks to [Codium AI](https://www.latent.space/p/codium-agents)
 
 Non-goals:
@@ -121,7 +122,7 @@ log.store = throttle(sendToLogFlare, 1000)
 
 <details>
 <summary>
-Async/Blocking logging
+<strong>Async/Blocking logging</strong>
 </summary>
 
 Logging is synchronous by default in smol logger.
@@ -149,6 +150,8 @@ logger.store = async ({ logName, loggedLine, payload, secondsSinceStart, seconds
 // now you can block execution in an async context
 await logger.asyncLog('my message here', { foo: 'bar' })
 ```
+
+**Note: this funcitonality is new and not tested, please try out and give fixes/feedback**
 
 </details>
 
@@ -198,5 +201,13 @@ semantic-release-cli setup
 
 From now on, you'll need to use `npm run commit`, which is a convenient way to create conventional commits.
 
-Automatic releases are possible thanks to [semantic release](https://github.com/semantic-release/semantic-release), which publishes your code automatically on [github](https://github.com/) and [npm](https://www.npmjs.com/), plus generates automatically a changelog. This setup is highly influenced by [Kent C. Dodds course on egghead.io](https://egghead.io/courses/how-to-write-an-open-source-javascript-library)
+Automatic releases are possible thanks to [semantic release](https://github.com/semantic-release/semantic-release), which publishes your code automatically on [github](https://github.com/) and [npm](https://www.npmjs.com/), plus generates automatically a changelog.
 
+note from swyx - wasnt able to get the publishing to work, kept failing.
+
+for now:
+
+```bash
+npm version patch
+npm publish --access=public
+```

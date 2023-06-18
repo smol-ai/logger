@@ -1,4 +1,4 @@
-# smol logger
+# 🐤 smol logger
 
 **A minimal viable logger for Prompt/LLM App Engineering.** 
 
@@ -75,7 +75,7 @@ We default to [single arity to encourage this in the JS ecosystem](https://www.f
 
 ## Clearing Logs
 
-To clear your logs - delete the `.logs` folder! Simple as!
+To clear your logs - delete the `.logs` folder! Simple as! It'll regenerate once you run the next log.
 
 ## Production: Remote Storage
 
@@ -185,10 +185,11 @@ const response = await wrapped({
 Sometimes the output can be very verbose (as is the case with OpenAI chatCompletion). so we also allow you to expose a simple "log transformer" that is an arbitrary function to modify the intercepted output to a format of your choice that you like:
 
 ```js
-// custom 
+// 
 const wrapped = logger.wrap(
   openai.createChatCompletion.bind(openai),  // binding is impt bc of how OpenAI internally retrieves its config
-  {
+  { 
+    wrapLogName: 'chatGPT APIcall', // optional - customize the name that shows up on the log. defaults to "wrap(fn.name)"
     logTransformer: (args, result) => ({ // can be async
       // ...result, // optional - if you want the full raw result itself
       prompt: args[0].messages,

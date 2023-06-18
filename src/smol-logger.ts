@@ -17,32 +17,23 @@ export class SmolLogger {
     if (!fs.existsSync(this.logDirectory)) fs.mkdirSync(this.logDirectory);
     this.currentRunDir = path.join(this.logDirectory, (new Date().toISOString()).slice(0,19).split('T').join(' '));
     if (this.logToConsole) {
-      console.log(this.LOGCOLOR, 'logToConsole is set to true, we will be printing verbose logs');
-      if (this.logToStore) console.log(this.LOGCOLOR('logToStore is set to true, we will be storing logs to ') + this.currentRunDir);
+      console.log(this.LOGCOLOR('🐤 smol logger activated! logToConsole is set to true, we will be printing verbose logs'));
+      if (this.logToStore) console.log(this.LOGCOLOR('🐤 logToStore is set to true, we will be storing logs to ') + this.currentRunDir);
     }
     fs.mkdirSync(this.currentRunDir);
   }
 
   // default implementation of a namer function, overwrite to change how logs are named
-  logName = (name: string) => {
-    const currentCount = pad(this.counter++, 3)
-    return `${currentCount}: ${name}`
-  }
+  logName = (name: string) => `${pad(this.counter++, 3)}: ${name}`
 
   // default implementation of store that just writes to a file. overwrite to log to somewhere else
   store: Store = ({ logName, loggedLine, payload, secondsSinceStart, secondsSinceLastLog, ...args }: 
     { logName: string, loggedLine: string | null, payload: any, secondsSinceStart: number, secondsSinceLastLog: number }
   ) => {
     const destination = path.join(this.currentRunDir, `${logName}.json`)
-    if (this.logToConsole) console.log("Stored to", destination);
+    if (this.logToConsole) console.log(this.LOGCOLOR("🐤 Stored to"), destination);
     const p = loggedLine ? loggedLine.split(':') : ['UNKNOWN', 'UNKNOWN', 'UNKNOWN', 'UNKNOWN']
-    fs.writeFileSync(
-      destination,
-      JSON.stringify(
-        { $callsite: { filePath: p[0] + ':' + p[1], location: p[2] + ':' + p[3]}, $timeElapsed: { sinceStart: secondsSinceStart, sinceLast: secondsSinceLastLog }, $payload: payload, ...args 
-      }, 
-        getCircularReplacer(), 2)
-    );
+    fs.writeFileSync(destination, JSON.stringify({ $callsite: { filePath: p[0] + ':' + p[1], location: p[2] + ':' + p[3]}, $timeElapsed: { sinceStart: secondsSinceStart, sinceLast: secondsSinceLastLog }, $payload: payload, ...args }, getCircularReplacer(), 2));
   }
 
   private _log = (name: string, args: any) => { // arrow fn or else this.* references wont work when called from other files
@@ -53,7 +44,7 @@ export class SmolLogger {
     const secondsSinceLastLog = (currentTime - this.lastLogTime) / 1000;
     this.lastLogTime = currentTime;
     if (this.logToConsole) {
-      console.log(this.LOGCOLOR("============== Start: " + logName + "=============="));
+      console.log(this.LOGCOLOR("============== Start: ") + logName + this.LOGCOLOR("=============="));
       const originalWrite = process.stdout.write;
       process.stdout.write = (chunk, encoding: any, callback?: (err?: Error | undefined) => void): boolean => {
         chunk.toString().split('\n').forEach(line => {
@@ -65,7 +56,7 @@ export class SmolLogger {
       console.log(loggedLine, this.LOGCOLOR("with"), secondsSinceStart.toFixed(2), this.LOGCOLOR("seconds elapsed"));
       console.log(args);
       process.stdout.write = originalWrite;
-      console.log(this.LOGCOLOR("============== End: " + logName + "=============="));
+      console.log(this.LOGCOLOR("============== End: ") + logName + this.LOGCOLOR("=============="));
     }
     return { logName, loggedLine, secondsSinceStart, secondsSinceLastLog, payload: args }
   }
@@ -80,7 +71,7 @@ export class SmolLogger {
 
   wrap = (
     fnToWrap: Function, // todo: improve the typing on this, please help
-    opts = {} as {logTransformer: Function}  // todo: improve the typing on this, please help
+    opts = {} as {wrapLogName: string, logTransformer: Function}  // todo: improve the typing on this, please help
     ) => async (...args: any[]) => {
     let result = 'NO RESULT'
     opts.logTransformer = opts?.logTransformer ?? ((_args: any, result: any) => result)
@@ -91,7 +82,7 @@ export class SmolLogger {
       console.error('error happened while wrapping and transforming ' + fnToWrap.name)
       throw err
     } finally {
-      await this.asyncLog('wrap(' + fnToWrap.name + ')', {
+      await this.asyncLog(opts?.wrapLogName ?? 'wrap(' + fnToWrap.name + ')', {
         args,
         result
       })

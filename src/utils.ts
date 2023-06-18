@@ -11,7 +11,10 @@ export type Store = ({ logName, loggedLine, payload, secondsSinceStart, secondsS
 export function getCurrentFilePath() {
   const stack = new Error().stack;
   if (stack) {
-    const stackLines = stack.split('\n').slice(1).filter(line => !line.includes('/node_modules/@smol-ai/logger'));
+    const stackLines = stack.split('\n').slice(1).filter(line => 
+      // filter out node:internal/process and node_modules
+      !line.includes('node:internal/process') && !line.includes('/node_modules/@smol-ai/logger')
+    );
     const filePathLine = stackLines[0].trim();
     //   const filePath = filePathLine.substring(filePathLine.indexOf('(') + 1, filePathLine.indexOf(')') - 1);  // this one  works if in a direct file, but not in a library
     // this one works in a library where the trace is 'at async file:///Users/swyx/Documents/Work/gptapiexperiment/newtest.mjs:28:18'

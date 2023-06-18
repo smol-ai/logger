@@ -16,9 +16,11 @@ fs.readdir(logsDir, (err: any, dirs: string[]) => {
   if(!firstFile) return console.log('No files in directory',  dirs[0]);
   const headerData = fs.readFileSync(path.join(logsDir, dirs[0], firstFile));
   const headerObj = JSON.parse(headerData);
-  Object.keys(headerObj).forEach(topheader => {
-    // listing headers 1 layer deep
-    Object.keys(headerObj[topheader]).forEach(subheader => headers.push(topheader + ':' + subheader));
+  headers.push('LogName')
+  Object.keys(headerObj).forEach(function (topheader) {
+      if (topheader === '$payload') headers.push('payloadType');
+      // listing headers 1 layer deep
+      Object.keys(headerObj[topheader]).forEach(function (subheader) { return headers.push(topheader + ':' + subheader); });
   });
 
   dirs.filter(
@@ -29,27 +31,24 @@ fs.readdir(logsDir, (err: any, dirs: string[]) => {
     const dirFiles: string[] = fs.readdirSync(dirPath);
     dirFiles.forEach(file => {
       let row: string[] = [];
+      row.push(file.replace('.json', '')); // logName
       const filePath = path.join(dirPath, file);
       const fileData = fs.readFileSync(filePath);
       const fileObj = JSON.parse(fileData);
       Object.keys(fileObj).forEach(key => {
-        if (key === '$payload') {
-          const payload = fileObj[key]
-          if (Array.isArray(payload)) {
-            row.push('array:'+payload.length);
-            payload.forEach(item => row.push(JSON.stringify(item)));
-          } else if (typeof payload === 'object') {
-            row.push('object:' + Object.keys(payload).join(',')); // serves as a "payload type"
-            Object.keys(fileObj[key]).forEach(
-              payloadKey => row.push(JSON.stringify(fileObj[key][payloadKey]))
-            );
-          } else {
-            // just a raw value
-            row.push('rawValue')
-            row.push(JSON.stringify(payload))
-          }
+        const payload = fileObj[key]
+        if (Array.isArray(payload)) {
+          if (key === '$payload') row.push('array:'+payload.length);
+          payload.forEach(item => row.push(JSON.stringify(item)));
+        } else if (typeof payload === 'object') {
+          if (key === '$payload') row.push('object:' + Object.keys(payload).join(',')); // serves as a "payload type"
+          Object.keys(fileObj[key]).forEach(
+            payloadKey => row.push(JSON.stringify(fileObj[key][payloadKey]))
+          );
         } else {
-          row.push(JSON.stringify(fileObj[key]))
+          // just a raw value
+          if (key === '$payload') row.push('rawValue')
+          row.push(JSON.stringify(payload))
         }
       });
       rows.push(row);

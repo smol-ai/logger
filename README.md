@@ -106,11 +106,14 @@ logger.store = ({ logName, loggedLine, payload, secondsSinceStart, secondsSinceL
 If you expect high volumes of logs, you should batch them:
 
 ```js
+// this is untested sample code for now, pls send PR if you run and try it
 const logMessages = []
 
 function throttle(func, delay = 1000) {
   let timeout = null;
   return function(...args) {
+    const { logName, loggedLine, payload, secondsSinceStart, secondsSinceLastLog } = args;
+    logMessages.push(({ message: logName, metadata: {loggedLine, payload, secondsSinceStart, secondsSinceLastLog }}));
     if (!timeout) {
       timeout = setTimeout(() => {
         func.call(this, ...args);

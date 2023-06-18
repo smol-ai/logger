@@ -16,9 +16,10 @@ fs.readdir(logsDir, (err: any, dirs: string[]) => {
   if(!firstFile) return console.log('No files in directory',  dirs[0]);
   const headerData = fs.readFileSync(path.join(logsDir, dirs[0], firstFile));
   const headerObj = JSON.parse(headerData);
-  Object.keys(headerObj).forEach(header => headers.push(header));
-  // listing headers 1 layer deep
-  Object.keys(headerObj["$payload"]).forEach(header => headers.push('$payload:' + header));
+  Object.keys(headerObj).forEach(topheader => {
+    // listing headers 1 layer deep
+    Object.keys(headerObj[topheader]).forEach(subheader => headers.push(topheader + ':' + subheader));
+  });
 
   dirs.filter(
     // filter for directories using fs function

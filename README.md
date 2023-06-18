@@ -14,12 +14,13 @@ Use your IDE as Logging UI - a fast, simple, extensible, zero dependency Node.js
 ## Features
 
 - By default, logs to both the terminal and local json files for easy navigation/versioning
+  - Automatically logs time elapsed, filepath, line number, order of log call
+  - Clear logs by deleting the `.logs` folder (customizable)
   - CLI to compile json logs to a `.tsv` file for spreadsheet import (e.g. Google Sheets, Excel, Quadratic)
-- Logs time elapsed, filepath, line number of log call
 - Wrap & transform async calls to capture Prompt vs Response pairs
 - Extensible
-  - Extend the log store to a remote store, e.g. LogFlare
-  - Customize everything from naming to terminal log color
+  - Persist the logs to a remote store, e.g. LogFlare
+  - Customize everything from naming/indentation to terminal log color
 - Zero dependency, <100 LOC core
 - Typescript, so hot right now
 - MIT Open Source: https://github.com/smol-ai/logger
@@ -71,6 +72,10 @@ myBadMultiArityFunction(...log({foo, bar, baz}).values()) // log them all why no
 ```
 
 We default to [single arity to encourage this in the JS ecosystem](https://www.freecodecamp.org/news/how-to-optimize-for-change-software-development/).
+
+## Clearing Logs
+
+To clear your logs - delete the `.logs` folder! Simple as!
 
 ## Production: Remote Storage
 
@@ -235,6 +240,9 @@ logger.logDirectory = '.smol-logs' // change default file store directory
 
 logger.logToConsole = false // turn off logging to terminal
 logger.logToStore = false // turn off logging to store
+// more ideas for usage
+logger.logToStore = Math.random() < 0.05 // only sample 5% of traffic
+logger.logToStore = user.isVIPCustomer() // log based on feature flag
 
 logger.logName = (name: string) => `My custom logName: ${name}` // change Log naming!
 

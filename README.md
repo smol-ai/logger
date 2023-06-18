@@ -1,24 +1,31 @@
 # smol logger
 
-An extensible, fast logging tool that **uses the filesystem as Log UI**.
+**A minimal viable logger for Prompt/LLM App Engineering.** 
+
+Use your IDE as Logging UI - a fast, simple, extensible, zero dependency Node.js logging tool.
+
+- In App Development: a fast logging tool that **uses the filesystem as Log UI**
+- In Prompt Engineering: wrap and transform async calls to OpenAI etc to cleanly **capture Prompt vs Response**
+- In Production: easily extended to send logs to a log store [like Logflare](https://github.com/smol-ai/logger#extend-to-remote-storage)
 
 <img height="400" alt="image" src="https://github.com/smol-ai/logger/assets/6764957/a862f61d-9459-42d2-bab7-572231c5c8e8">
 
 ## Features
 
-- Logs to both the console and local json files for easy navigation/versioning
-- Logs time elapsed, filepath/line number of log call
+- By default, logs to both the terminal and local json files for easy navigation/versioning
+- Logs time elapsed, filepath, line number of log call
+- Wrap & transform async calls to capture Prompt vs Response pairs
 - Extensible
   - Extend the log store to a remote store, e.g. LogFlare
   - Customize everything from naming to terminal log color
-- Zero dependency, <100 LOC
+- Zero dependency, <100 LOC core
 - MIT Open Source: https://github.com/smol-ai/logger
 - (todo) tested thanks to [Codium AI](https://www.latent.space/p/codium-agents)
 
 Non-goals:
 
 - no log levels. too complicated - just add a descriptive log name, and either send all logs or none at all
-- not going for running in the browser  - for now. open an issue to discuss
+- not going for running in the browser  - for now. open an issue to discuss please! not sure how complicated it would be to take out the file storage for something else.
 
 ## Usage
 

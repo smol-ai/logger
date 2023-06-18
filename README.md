@@ -9,7 +9,7 @@ Use your IDE as Logging UI - a fast, simple, extensible, zero dependency Node.js
   - CLI to export logs to `.tsv` for spreadsheet import. **Spreadsheets are all you need** for prompt engineering!
 - In Production: easily extended to send logs to a log store [like Logflare](https://github.com/smol-ai/logger#extend-to-remote-storage)
 
-<img height="400" alt="image" src="https://github.com/smol-ai/logger/assets/6764957/a862f61d-9459-42d2-bab7-572231c5c8e8">
+<img width="1460" alt="image" src="https://github.com/smol-ai/logger/assets/6764957/75b68625-2516-492e-8642-be316d57d5f4">
 
 ## Features
 
@@ -206,6 +206,7 @@ const response = await wrapped({
 ```
 
 <img height="400" alt="image" src="https://github.com/smol-ai/logger/assets/6764957/0b15a508-db3b-4a52-8a8f-a94a7e0282a6">
+<img height="400" alt="image" src="https://github.com/smol-ai/logger/assets/6764957/75b68625-2516-492e-8642-be316d57d5f4">
 
 ## `log2tsv` CLI
 

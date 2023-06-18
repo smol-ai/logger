@@ -320,9 +320,9 @@ do {
 
 ## Benchmarks
 
-We aren't really going for max speed anyway since we care more about DX in prod, but see `/benchmark`:
+We aren't really going for max speed anyway since we care more about DX in dev, but see `/benchmark`:
 
-```
+```bash
 $ cd benchmark && npm install
 $ node bench.js > bench.txt   
 $ grep "^bench" bench.txt

@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@smol-ai/logger": "^0.0.15",
+    "@smol-ai/logger": "^0.0.16",
     "bunyan": "^1.8.15",
     "fastbench": "^1.0.1",
     "pino": "^8.14.1",

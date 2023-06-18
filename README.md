@@ -21,7 +21,7 @@ Use your IDE as Logging UI - a fast, simple, extensible, zero dependency Node.js
 - Extensible
   - Persist the logs to a remote store, e.g. LogFlare
   - Customize everything from naming/indentation to terminal log color
-- Zero dependency, <100 LOC core
+- Zero dependency, <100 LOC core. It's faster than Winston and Bunyan (see benchmarks)
 - Typescript, so hot right now
 - MIT Open Source: https://github.com/smol-ai/logger
 - (todo) tested thanks to [Codium AI](https://www.latent.space/p/codium-agents)
@@ -313,6 +313,26 @@ do {
 > open issue if of interest, lots to design here
 
 </details>
+
+## Benchmarks
+
+We aren't really going for max speed anyway since we care more about DX in prod, but see `/benchmark`:
+
+```
+$ cd benchmark && npm install
+$ node bench.js > bench.txt   
+$ grep "^bench" bench.txt
+benchWinston*100000: 1.690s
+benchBunyan*100000: 1.820s
+benchPino*100000: 892.089ms
+benchSmol*100000: 1.290s
+benchWinston*100000: 1.620s
+benchBunyan*100000: 1.712s
+benchPino*100000: 911.538ms
+benchSmol*100000: 1.284s
+```
+
+This hopefully demonstrates we are faster than Winston/Bunyan and competitive to Pino with a better feature set.
 
 ## Contributor notes
 

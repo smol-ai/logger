@@ -1,13 +1,7 @@
 import fs from 'fs';
 import path from 'path';
+import { Store, getCircularReplacer, getCurrentFilePath, pad } from './utils';
 
-type Store = ({ logName, loggedLine, payload, secondsSinceStart, secondsSinceLastLog }: {
-  logName: string;
-  loggedLine: string | null;
-  payload: any;
-  secondsSinceStart: number;
-  secondsSinceLastLog: number;
-}) => any
 export class SmolLogger {
   counter = 0;
   startTime = Date.now();
@@ -61,7 +55,7 @@ export class SmolLogger {
       console.log(this.LOGCOLOR(logName), loggedLine, this.LOGCOLOR("with"), secondsSinceStart.toFixed(2), this.LOGCOLOR("seconds elapsed"));
       console.log(this.LOGCOLOR(logName), args);
     }
-    return { logName, loggedLine,secondsSinceStart,secondsSinceLastLog, payload: args }
+    return { logName, loggedLine, secondsSinceStart, secondsSinceLastLog, payload: args }
   }
   log = (name: string, args: any) => {
     if (this.logToStore) this.store(this._log(name, args))
@@ -72,19 +66,20 @@ export class SmolLogger {
     return args
   }
 
-  intercept = (
-    interceptedFn: Function, // todo: improve the typing on this, please help
+  wrap = (
+    fnToWrap: Function, // todo: improve the typing on this, please help
     opts: { logTransformer: any}  // todo: improve the typing on this, please help
     ) => async (...args: any[]) => {
     let result = 'NO RESULT'
     opts.logTransformer = opts.logTransformer ?? ((args: any, result: any) => result)
     try {
-      result = await interceptedFn(...args)
+      result = await fnToWrap(...args)
       result = await opts.logTransformer(args, result)
     } catch (err) {
+      console.error('error happened while wrapping and transforming ' + fnToWrap.name)
       throw err
     } finally {
-      await this.asyncLog(interceptedFn.name, {
+      await this.asyncLog(fnToWrap.name, {
         args,
         result
       })
@@ -92,43 +87,6 @@ export class SmolLogger {
     }
   }
 
-}
-
-function getCurrentFilePath() {
-  const stack = new Error().stack;
-  if (stack) {
-    // Extract the filepath from the call stack
-    const stackLines = stack.split('\n');
-    // The second line usually contains the filepath and line number of the current function
-    if (stackLines.length >= 4) {
-      const filePathLine = stackLines[3].trim();
-      // Extract the filepath from the line
-      const filePath = filePathLine.substring(filePathLine.indexOf('(') + 1, filePathLine.lastIndexOf(':'));
-      return filePath;
-    }
-  }
-  return null;
-}
-
-// pad numbers with 0
-function pad(num: number, size = 2) {
-  let s = num + "";
-  while (s.length < size) s = "0" + s;
-  return s;
-}
-
-
-function getCircularReplacer() {
-  const seen = new WeakSet();
-  return (key: any, value: any) => {
-    if (typeof value === "object" && value !== null) {
-      if (seen.has(value)) {
-        return;
-      }
-      seen.add(value);
-    }
-    return value;
-  };
 }
 
 export default SmolLogger;

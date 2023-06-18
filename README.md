@@ -4,8 +4,9 @@
 
 Use your IDE as Logging UI - a fast, simple, extensible, zero dependency Node.js logging tool.
 
-- In App Development: a fast logging tool that **uses the filesystem as Log UI**
-- In Prompt Engineering: wrap and transform async calls to OpenAI etc to cleanly **capture Prompt vs Response**
+- In App Development: a fast logging tool that **uses the filesystem as Log UI**.
+- In Prompt Engineering: wrap and transform async calls to OpenAI etc to cleanly **capture Prompt vs Response**.
+  - CLI to export logs to `.tsv` for spreadsheet import. **Spreadsheets are all you need** for prompt engineering!
 - In Production: easily extended to send logs to a log store [like Logflare](https://github.com/smol-ai/logger#extend-to-remote-storage)
 
 <img height="400" alt="image" src="https://github.com/smol-ai/logger/assets/6764957/a862f61d-9459-42d2-bab7-572231c5c8e8">
@@ -13,12 +14,14 @@ Use your IDE as Logging UI - a fast, simple, extensible, zero dependency Node.js
 ## Features
 
 - By default, logs to both the terminal and local json files for easy navigation/versioning
+  - CLI to compile json logs to a `.tsv` file for spreadsheet import (e.g. Google Sheets, Excel, Quadratic)
 - Logs time elapsed, filepath, line number of log call
 - Wrap & transform async calls to capture Prompt vs Response pairs
 - Extensible
   - Extend the log store to a remote store, e.g. LogFlare
   - Customize everything from naming to terminal log color
 - Zero dependency, <100 LOC core
+- Typescript, so hot right now
 - MIT Open Source: https://github.com/smol-ai/logger
 - (todo) tested thanks to [Codium AI](https://www.latent.space/p/codium-agents)
 
@@ -41,7 +44,7 @@ use:
 import { SmolLogger } from '@smol-ai/logger';
 
 const logger = new SmolLogger(true)
-const log = logger.log
+const log = logger.log // optional convenient alias for less verbosity
 
 log('name of log (required)', payload) // basic usage
 ```
@@ -69,13 +72,13 @@ myBadMultiArityFunction(...log({foo, bar, baz}).values()) // log them all why no
 
 We default to [single arity to encourage this in the JS ecosystem](https://www.freecodecamp.org/news/how-to-optimize-for-change-software-development/).
 
-## Extend to Remote Storage
+## Production: Remote Storage
 
 For production logging, Smol Logger's storage destination can be overwritten. We like [Logflare](https://logflare.app/)!
 
 ```js
-// OPTIONAL: store the local file store for reuse
-const oldStore = logger.store
+// OPTIONAL: keep the default local file store for reuse
+const localStore = logger.store
 
 // override the default local file store with your own remote filestore
 // { logName: string, loggedLine: string | null, payload: any, secondsSinceStart: number, secondsSinceLastLog: number }
@@ -88,8 +91,8 @@ logger.store = ({ logName, loggedLine, payload, secondsSinceStart, secondsSinceL
     },
     body: JSON.stringify({ message: logName, metadata: {loggedLine, payload, secondsSinceStart, secondsSinceLastLog }})
   })
-  // OPTIONAL: run the local file store as well
-  oldStore({ logName, loggedLine, payload, secondsSinceStart, secondsSinceLastLog })
+  // OPTIONAL: log to the local file store as well
+  localStore({ logName, loggedLine, payload, secondsSinceStart, secondsSinceLastLog })
 }
 ```
 
@@ -134,7 +137,7 @@ log.store = throttle(sendToLogFlare, 1000)
 
 Logging is synchronous by default in smol logger.
 
-Note that in the above example we are firing off an async fetch inside of a synchronous call. If your application crashes there is a smol chance that the log may not complete sending since it is running asynchronously. If you need to block for an async call, you can overwrite the `asyncLog` method:
+Note that in the above example we are firing off an async fetch inside of a synchronous call. If your application crashes there is a smol chance that the log may not complete sending since it is running asynchronously. If you need to block for an async call, you can use the `asyncLog` method with an async store:
 
 ```js
 // OPTIONAL: store the local file store for reuse
@@ -162,12 +165,12 @@ await logger.asyncLog('my message here', { foo: 'bar' })
 
 </details>
 
-## Advanced: Intercept input vs output
+## LLM Apps: Intercept input vs output
 
-This logs BOTH input and output of a function that you want to monitor.
+This logs BOTH input and output of an async function that you want to monitor. Mostly useful for prompt engineering where you really care about input vs output pairs being visible in the same log file.
 
 ```js
-const wrapped = logger.intercept(openai.createChatCompletion.bind(openai)) // binding is impt bc of how OpenAI internally retrieves its config
+const wrapped = logger.wrap(openai.createChatCompletion.bind(openai)) // binding is impt bc of how OpenAI internally retrieves its config
 const response = await wrapped({
         model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
         messages: [/* etc */ ],
@@ -178,10 +181,10 @@ Sometimes the output can be very verbose (as is the case with OpenAI chatComplet
 
 ```js
 // custom 
-const wrapped = logger.intercept(
+const wrapped = logger.wrap(
   openai.createChatCompletion.bind(openai),  // binding is impt bc of how OpenAI internally retrieves its config
   {
-    logTransformer: (args, result) => ({
+    logTransformer: (args, result) => ({ // can be async
       // ...result, // optional - if you want the full raw result itself
       prompt: args[0].messages,
       response: result.data.choices[0].message,
@@ -192,13 +195,25 @@ const response = await wrapped({
         model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
         messages: [/* etc */ ],
     });
-// now the logged response has highlighted the specific fields of our interest
+
+// now the logged response only has the specific fields of our interest, see screenshot below
 ```
 
 <img height="400" alt="image" src="https://github.com/smol-ai/logger/assets/6764957/0b15a508-db3b-4a52-8a8f-a94a7e0282a6">
 
+## log2tsv CLI
 
-The `logTransformer` function can be async in case you need it.
+Individual JSON log files are good for debugging individual runs. Good default for smol-logger.
+
+For Prompt Engineering, you also need to compare prompts vs outputs easily across runs, and rate them/write evals. For this, no interface is more flexible or GOATed than spreadsheets. So we help you export your logs for spreadsheets.
+
+You can run the `log2tsv` CLI which outputs a `logs.tsv` file in your `./logs` folder (will take a PR to customize this). You can import this `.tsv` file in Google Sheets/Excel/Quadratic/etc to do further prompt engine.
+
+```bash
+npm run log2tsv
+```
+
+> Will take a PR to make this programmatically runnable (and not just a CLI) if that is something you want.
 
 ## Customize everything else
 
@@ -280,6 +295,7 @@ note from swyx - wasnt able to get the publishing to work, kept failing.
 for now:
 
 ```bash
+npm run build
 npm version patch
 npm publish --access=public
 ```

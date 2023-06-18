@@ -18,10 +18,15 @@
   "engines": {
     "node": ">=6.0.0"
   },
+  "bin": {
+    "log2tsv": "dist/cli.js"
+  },
   "scripts": {
     "lint": "tslint  --project tsconfig.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
     "prebuild": "rimraf dist",
-    "build": "tsc --module commonjs && rollup -c rollup.config.js --bundleConfigAsCjs",
+    "build": "npm run build-cli && npm run build-lib",
+    "build-lib": "tsc --module commonjs && rollup -c rollup.config.ts --bundleConfigAsCjs",
+    "build-cli": "tsc src/cli.ts --outDir dist",
     "start": "rollup -c rollup.config.ts -w",
     "test": "jest --coverage",
     "test:watch": "jest --coverage --watch",

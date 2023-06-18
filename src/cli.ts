@@ -18,7 +18,7 @@ fs.readdir(logsDir, (err: any, dirs: string[]) => {
   const headerObj = JSON.parse(headerData);
   Object.keys(headerObj).forEach(header => headers.push(header));
   // listing headers 1 layer deep
-  Object.keys(headerObj["payload"]).forEach(header => headers.push('payload:' + header));
+  Object.keys(headerObj["$payload"]).forEach(header => headers.push('$payload:' + header));
 
   dirs.filter(
     // filter for directories using fs function
@@ -32,14 +32,13 @@ fs.readdir(logsDir, (err: any, dirs: string[]) => {
       const fileData = fs.readFileSync(filePath);
       const fileObj = JSON.parse(fileData);
       Object.keys(fileObj).forEach(key => {
-        if (key === 'payload') {
+        if (key === '$payload') {
           const payload = fileObj[key]
           if (Array.isArray(payload)) {
-            // is array
-            row.push('arrayOfLength'+payload.length);
+            row.push('array:'+payload.length);
             payload.forEach(item => row.push(JSON.stringify(item)));
           } else if (typeof payload === 'object') {
-            row.push('objectWithFields:' + Object.keys(payload).join(',')); // serves as a "payload type"
+            row.push('object:' + Object.keys(payload).join(',')); // serves as a "payload type"
             Object.keys(fileObj[key]).forEach(
               payloadKey => row.push(JSON.stringify(fileObj[key][payloadKey]))
             );

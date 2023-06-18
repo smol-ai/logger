@@ -219,7 +219,7 @@ You can also put this in an npm script and it will run:
 // package.json
 {
   "scripts": {
-    "log2tsv": "log2tsv" // and then npm run log2tsv
+    "tsv": "log2tsv" // and then npm run tsv
   }
 }
 ```
@@ -253,7 +253,11 @@ Other log colors to try:
 \x1b[37m: White
 ```
 
-Get creative! For example you can stack logname functions...
+
+<details>
+<summary>
+Get creative! For example you can stack logName functions in a single reducer function...
+</summary>
 
 ```js
 // for an advanced application, you can add log names in a stack
@@ -268,7 +272,7 @@ do {
     do {
       logStack.unshift(name => '   ' + name)
       // everything logged here is two indent in
-      log('logname2 here ' + temp, temp)
+      log('logname2 here ' + temp2, temp2)
       logStack.shift()
     } while (temp2++ < 5)
   logStack.shift()
@@ -277,8 +281,25 @@ do {
 
 <img height="400" alt="image" src="https://github.com/smol-ai/logger/assets/6764957/2f15bf5a-a25b-4b69-b7e5-38524beeef70">
 
+> In future we might provide a more official API for nested logging:
+> 
+> ```js
+> const sublog = logger.sublog() // a new instance of Logger, with indented log set
+> let temp = 0
+> do {
+>   sublog('logname1 here ' + temp, temp)
+>   const sublog2 = sublog.sublog()
+>     let temp2 = 0
+>     do {
+>       // everything logged here is two indent in
+>       sublog2('logname2 here ' + temp2, temp2)
+>     } while (temp2++ < 5)
+> } while (temp++ < 5)
+> ```
+> 
+> open issue if of interest, lots to design here
 
-
+</details>
 
 ## Contributor notes
 

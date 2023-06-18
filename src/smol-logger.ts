@@ -35,11 +35,11 @@ export class SmolLogger {
   ) => {
     const destination = path.join(this.currentRunDir, `${logName}.json`)
     if (this.logToConsole) console.log("Stored to", destination);
-    const p = loggedLine ? loggedLine.split(':') : ['UNKNOWN', 'UNKNOWN', 'UNKNOWN']
+    const p = loggedLine ? loggedLine.split(':') : ['UNKNOWN', 'UNKNOWN', 'UNKNOWN', 'UNKNOWN']
     fs.writeFileSync(
       destination,
       JSON.stringify(
-        { $path: p[0] + ':' + p[1], $location: p[2], $timeElapsed: { sinceStart: secondsSinceStart, sinceLast: secondsSinceLastLog }, $payload: payload, ...args 
+        { $path: p[0] + ':' + p[1], $location: p[2] + ':' + p[3], $timeElapsed: { sinceStart: secondsSinceStart, sinceLast: secondsSinceLastLog }, $payload: payload, ...args 
       }, 
         getCircularReplacer(), 2)
     );

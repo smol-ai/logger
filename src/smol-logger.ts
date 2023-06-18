@@ -44,7 +44,7 @@ export class SmolLogger {
     const secondsSinceLastLog = (currentTime - this.lastLogTime) / 1000;
     this.lastLogTime = currentTime;
     if (this.logToConsole) {
-      console.log(this.LOGCOLOR("▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ Start: ") + logName + this.LOGCOLOR("▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼"));
+      console.log(this.LOGCOLOR("▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ Start: ") + logName);
       const originalWrite = process.stdout.write;
       process.stdout.write = (chunk, encoding: any, callback?: (err?: Error | undefined) => void): boolean => {
         chunk.toString().split('\n').forEach(line => {
@@ -56,7 +56,7 @@ export class SmolLogger {
       console.log(loggedLine, this.LOGCOLOR("with"), secondsSinceStart.toFixed(2), this.LOGCOLOR("seconds elapsed"));
       console.log(args);
       process.stdout.write = originalWrite;
-      console.log(this.LOGCOLOR("▲ ▲ ▲ ▲ ▲ ▲ ▲ ▲  End: ") + logName + this.LOGCOLOR("▲ ▲ ▲ ▲ ▲ ▲ ▲ ▲"));
+      console.log(this.LOGCOLOR("▲ ▲ ▲ ▲ ▲ ▲ ▲ ▲  End: ") + logName);
     }
     return { logName, loggedLine, secondsSinceStart, secondsSinceLastLog, payload: args }
   }
@@ -74,18 +74,16 @@ export class SmolLogger {
     opts = {} as {wrapLogName: string, logTransformer: Function}  // todo: improve the typing on this, please help
     ) => async (...args: any[]) => {
     let result = 'NO RESULT'
-    opts.logTransformer = opts?.logTransformer ?? ((_args: any, result: any) => result)
     try {
       result = await fnToWrap(...args)
-      result = await opts.logTransformer(args, result)
     } catch (err) {
       console.error('error happened while wrapping and transforming ' + fnToWrap.name)
       throw err
     } finally {
-      await this.asyncLog(opts?.wrapLogName ?? 'wrap(' + fnToWrap.name + ')', {
-        args,
-        result
-      })
+      const payload = { args } as Record<string, any>
+      if (opts.logTransformer) payload["transformedResult"] = opts.logTransformer(args, result) // do this to remind people they're looking at a transformed result
+      else payload["result"] = result
+      await this.asyncLog(opts?.wrapLogName ?? 'wrap(' + fnToWrap.name + ')', payload)
       return result 
     }
   }

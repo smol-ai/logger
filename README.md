@@ -232,6 +232,7 @@ You can also put this in an npm script and it will run:
 
 <img width="1451" alt="image" src="https://github.com/smol-ai/logger/assets/6764957/3f6500cd-9a42-43ec-8aba-c5930fb568a1">
 
+Note the header is taken from the first log - and most likely will not fully match up to the body of all the logs especially if you have irregularly shaped logs. We trust that you'll be able to figure out how to retitle them yourself if they are impt enough in the spreadsheet.
 
 > Will take a PR to make this programmatically runnable (and not just a CLI) if that is something you want.
 

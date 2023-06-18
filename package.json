@@ -16,7 +16,7 @@
   },
   "license": "MIT",
   "engines": {
-    "node": ">=6.0.0"
+    "node": ">=16.0.0"
   },
   "bin": {
     "log2tsv": "dist/cli.js"

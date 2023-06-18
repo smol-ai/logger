@@ -210,7 +210,18 @@ For Prompt Engineering, you also need to compare prompts vs outputs easily acros
 You can run the `log2tsv` CLI which outputs a `logs.tsv` file in your `./logs` folder (will take a PR to customize this). You can import this `.tsv` file in Google Sheets/Excel/Quadratic/etc to do further prompt engine.
 
 ```bash
-npm run log2tsv
+./node_modules/.bin/log2tsv # in a directory where @smol-ai/logger has been installed
+```
+
+You can also put this in an npm script and it will run:
+
+```js
+// package.json
+{
+  "scripts": {
+    "log2tsv": "log2tsv" // and then npm run log2tsv
+  }
+}
 ```
 
 > Will take a PR to make this programmatically runnable (and not just a CLI) if that is something you want.

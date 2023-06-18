@@ -11,14 +11,14 @@ export type Store = ({ logName, loggedLine, payload, secondsSinceStart, secondsS
 export function getCurrentFilePath() {
   const stack = new Error().stack;
   if (stack) {
-    // Extract the filepath from the call stack
     const stackLines = stack.split('\n');
-    // The second line usually contains the filepath and line number of the current function
-    if (stackLines.length >= 4) {
-      const filePathLine = stackLines[4].trim();
-      // Extract the filepath from the line
-      const filePath = filePathLine.substring(filePathLine.indexOf('(') + 1, filePathLine.lastIndexOf(':'));
-      return filePath;
+    if (stackLines.length >= 6) {
+        const filePathLine = stackLines[6].trim();
+        //   // this one  works if in a direct file, but not in a library
+        //   const filePath = filePathLine.substring(filePathLine.indexOf('(') + 1, filePathLine.indexOf(')') - 1);
+        // this one works in a library where the trace is 'at async file:///Users/swyx/Documents/Work/gptapiexperiment/newtest.mjs:28:18'
+        const filePath = filePathLine.slice(filePathLine.indexOf('file:///'))
+        return filePath;
     } else {
       console.error('unexpectedly short stack trace; not anticipated part of smol logger, please investigate')
       console.error(stack)

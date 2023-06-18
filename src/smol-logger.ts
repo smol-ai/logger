@@ -34,12 +34,13 @@ export class SmolLogger {
     { logName: string, loggedLine: string | null, payload: any, secondsSinceStart: number, secondsSinceLastLog: number }
   ) => {
     const destination = path.join(this.currentRunDir, `${logName}.json`)
-    if (this.logToConsole) console.log(this.LOGCOLOR(logName), "Stored to", destination);
+    if (this.logToConsole) console.log("Stored to", destination);
     const p = loggedLine ? loggedLine.split(':') : ['UNKNOWN', 'UNKNOWN', 'UNKNOWN']
     fs.writeFileSync(
       destination,
       JSON.stringify(
-        { path: p[0] + ':' + p[1], location: p[2], secondsSinceStart, secondsSinceLastLog, payload, ...args }, 
+        { $path: p[0] + ':' + p[1], $location: p[2], $timeElapsed: { sinceStart: secondsSinceStart, sinceLast: secondsSinceLastLog }, $payload: payload, ...args 
+      }, 
         getCircularReplacer(), 2)
     );
   }
@@ -52,8 +53,19 @@ export class SmolLogger {
     const secondsSinceLastLog = (currentTime - this.lastLogTime) / 1000;
     this.lastLogTime = currentTime;
     if (this.logToConsole) {
-      console.log(this.LOGCOLOR(logName), loggedLine, this.LOGCOLOR("with"), secondsSinceStart.toFixed(2), this.LOGCOLOR("seconds elapsed"));
-      console.log(this.LOGCOLOR(logName), args);
+      console.log(this.LOGCOLOR("============== Start: " + logName + "=============="));
+      const originalWrite = process.stdout.write;
+      process.stdout.write = (chunk, encoding: any, callback?: (err?: Error | undefined) => void): boolean => {
+        chunk.toString().split('\n').forEach(line => {
+            const modifiedChunk = this.LOGCOLOR(logName) + ' | ' + line + '\n';
+            return originalWrite.call(process.stdout, modifiedChunk, encoding, callback);
+        })
+        return true
+      };
+      console.log(loggedLine, this.LOGCOLOR("with"), secondsSinceStart.toFixed(2), this.LOGCOLOR("seconds elapsed"));
+      console.log(args);
+      process.stdout.write = originalWrite;
+      console.log(this.LOGCOLOR("============== End: " + logName + "=============="));
     }
     return { logName, loggedLine, secondsSinceStart, secondsSinceLastLog, payload: args }
   }
@@ -71,7 +83,7 @@ export class SmolLogger {
     opts: { logTransformer: any}  // todo: improve the typing on this, please help
     ) => async (...args: any[]) => {
     let result = 'NO RESULT'
-    opts.logTransformer = opts.logTransformer ?? ((args: any, result: any) => result)
+    opts.logTransformer = opts.logTransformer ?? ((_args: any, result: any) => result)
     try {
       result = await fnToWrap(...args)
       result = await opts.logTransformer(args, result)

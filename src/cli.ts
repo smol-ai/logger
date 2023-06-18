@@ -58,4 +58,7 @@ fs.readdir(logsDir, (err: any, dirs: string[]) => {
   const tsvContent = headers.join('\t') + '\n' + 
   rows.map(row => row.join('\t')).join('\n');
   fs.writeFileSync(path.join(logsDir, tsvFile), tsvContent);
+  // print that it has been written, in yellow
+  console.log('\x1b[33m%s\x1b[0m', '🐤 Wrote all json file logs to', path.join(logsDir, tsvFile));
+
 });

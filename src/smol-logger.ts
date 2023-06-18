@@ -39,7 +39,7 @@ export class SmolLogger {
     fs.writeFileSync(
       destination,
       JSON.stringify(
-        { $callsite: { filePath: p[0] + ':' + p[1], $location: p[2] + ':' + p[3]}, $timeElapsed: { sinceStart: secondsSinceStart, sinceLast: secondsSinceLastLog }, $payload: payload, ...args 
+        { $callsite: { filePath: p[0] + ':' + p[1], location: p[2] + ':' + p[3]}, $timeElapsed: { sinceStart: secondsSinceStart, sinceLast: secondsSinceLastLog }, $payload: payload, ...args 
       }, 
         getCircularReplacer(), 2)
     );
@@ -80,10 +80,10 @@ export class SmolLogger {
 
   wrap = (
     fnToWrap: Function, // todo: improve the typing on this, please help
-    opts: { logTransformer: any}  // todo: improve the typing on this, please help
+    opts = {} as {logTransformer: Function}  // todo: improve the typing on this, please help
     ) => async (...args: any[]) => {
     let result = 'NO RESULT'
-    opts.logTransformer = opts.logTransformer ?? ((_args: any, result: any) => result)
+    opts.logTransformer = opts?.logTransformer ?? ((_args: any, result: any) => result)
     try {
       result = await fnToWrap(...args)
       result = await opts.logTransformer(args, result)
@@ -91,7 +91,7 @@ export class SmolLogger {
       console.error('error happened while wrapping and transforming ' + fnToWrap.name)
       throw err
     } finally {
-      await this.asyncLog(fnToWrap.name, {
+      await this.asyncLog('wrap(' + fnToWrap.name + ')', {
         args,
         result
       })

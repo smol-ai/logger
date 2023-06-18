@@ -20,7 +20,7 @@ export class SmolLogger {
       console.log(this.LOGCOLOR('🐤 smol logger activated! logToConsole is set to true, we will be printing verbose logs'));
       if (this.logToStore) console.log(this.LOGCOLOR('🐤 logToStore is set to true, we will be storing logs to ') + this.currentRunDir);
     }
-    fs.mkdirSync(this.currentRunDir);
+    if (this.logToStore && !fs.existsSync(this.currentRunDir)) fs.mkdirSync(this.currentRunDir)
   }
 
   // default implementation of a namer function, overwrite to change how logs are named
@@ -44,7 +44,7 @@ export class SmolLogger {
     const secondsSinceLastLog = (currentTime - this.lastLogTime) / 1000;
     this.lastLogTime = currentTime;
     if (this.logToConsole) {
-      console.log(this.LOGCOLOR("▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ Start: ") + logName);
+      console.log("\x1b[35m ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ Start: " + logName);
       const originalWrite = process.stdout.write;
       process.stdout.write = (chunk, encoding: any, callback?: (err?: Error | undefined) => void): boolean => {
         chunk.toString().split('\n').forEach(line => {
@@ -56,7 +56,7 @@ export class SmolLogger {
       console.log(loggedLine, this.LOGCOLOR("with"), secondsSinceStart.toFixed(2), this.LOGCOLOR("seconds elapsed"));
       console.log(args);
       process.stdout.write = originalWrite;
-      console.log(this.LOGCOLOR("▲ ▲ ▲ ▲ ▲ ▲ ▲ ▲  End: ") + logName);
+      console.log("\x1b[35m ▲ ▲ ▲ ▲ ▲ ▲ ▲ ▲  End: " + logName);
     }
     return { logName, loggedLine, secondsSinceStart, secondsSinceLastLog, payload: args }
   }

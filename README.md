@@ -207,7 +207,7 @@ const response = await wrapped({
 
 <img height="400" alt="image" src="https://github.com/smol-ai/logger/assets/6764957/0b15a508-db3b-4a52-8a8f-a94a7e0282a6">
 
-## log2tsv CLI
+## `log2tsv` CLI
 
 Individual JSON log files are good for debugging individual runs. Good default for smol-logger.
 
@@ -229,6 +229,9 @@ You can also put this in an npm script and it will run:
   }
 }
 ```
+
+<img width="1451" alt="image" src="https://github.com/smol-ai/logger/assets/6764957/3f6500cd-9a42-43ec-8aba-c5930fb568a1">
+
 
 > Will take a PR to make this programmatically runnable (and not just a CLI) if that is something you want.
 

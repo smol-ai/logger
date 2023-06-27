@@ -73,15 +73,26 @@ export class SmolLogger {
     fnToWrap: Function, // todo: improve the typing on this, please help
     opts = {} as {wrapLogName: string, logTransformer: Function}  // todo: improve the typing on this, please help
     ) => async (...args: any[]) => {
-    let result = 'NO RESULT'
+    let result = 'NO RESULT' as string | Error
     try {
       result = await fnToWrap(...args)
     } catch (err) {
-      console.error('error happened while wrapping and transforming ' + fnToWrap.name)
-      throw err
+      console.error('smol logger: error happened while wrapping ' + fnToWrap.name)
+      console.error(err)
+      console.error('smol logger: please doublecheck your API key or call args')
+      result = err as any as Error
     } finally {
       const payload = { args } as Record<string, any>
-      if (opts.logTransformer) payload["transformedResult"] = opts.logTransformer(args, result) // do this to remind people they're looking at a transformed result
+      if (opts.logTransformer) {
+        try {
+          payload["transformedResult"] = opts.logTransformer(args, result) // do this to remind people they're looking at a transformed result
+        } catch (err) {
+          console.error('smol logger: error happened while transforming ' + fnToWrap.name)
+          console.error(err)
+          console.error('smol logger: pls doublecheck your transform function. we have logged the original result instead')
+          this.store(this._log('logTransformer error - check structure of data', {input: args, output: result}))
+        }
+      }
       else payload["result"] = result
       await this.asyncLog(opts?.wrapLogName ?? 'wrap(' + fnToWrap.name + ')', payload)
       return result 

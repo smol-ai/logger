@@ -12,9 +12,9 @@ export class SmolLogger {
   nestingLevel = 0
   currentRunDir = ''
   LOGCOLOR = (str: string) => "\x1b[33m" + str + "\x1b[0m";
-  constructor({ logToConsole, logToStore }: { logToConsole: boolean, logToStore: boolean }) {
-    this.logToConsole = logToConsole ?? true;
-    this.logToStore = logToStore ?? true;
+  constructor(args: { logToConsole: boolean, logToStore: boolean }) {
+    this.logToConsole = args.logToConsole ?? true;
+    this.logToStore = args.logToStore ?? true;
     if (!fs.existsSync(this.logDirectory)) fs.mkdirSync(this.logDirectory);
     this.currentRunDir = path.join(this.logDirectory, (new Date().toISOString()).slice(0,19).split('T').join(' '));
     if (this.logToConsole) {

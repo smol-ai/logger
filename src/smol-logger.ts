@@ -87,9 +87,9 @@ export class SmolLogger {
         try {
           payload["transformedResult"] = opts.logTransformer(args, result) // do this to remind people they're looking at a transformed result
         } catch (err) {
-          console.error('smol logger: error happened while transforming ' + fnToWrap.name)
+          console.error(this.LOGCOLOR('smol logger') + ': error happened while transforming ' + fnToWrap.name)
           console.error(err)
-          console.error('smol logger: pls doublecheck your transform function. we have logged the original result instead')
+          console.error(this.LOGCOLOR('smol logger') + ': pls doublecheck your transform function. we have logged the original result instead')
           this.store(this._log('logTransformer error - check structure of data', {input: args, output: result}))
         }
       }

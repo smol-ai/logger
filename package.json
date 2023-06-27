@@ -1,6 +1,6 @@
 {
   "name": "@smol-ai/logger",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "description": "",
   "keywords": [],
   "main": "dist/smol-logger.umd.js",

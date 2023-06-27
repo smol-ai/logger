@@ -24,6 +24,7 @@
   "scripts": {
     "lint": "tslint  --project tsconfig.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
     "prebuild": "rimraf dist",
+    "prepublish": "npm run build",
     "build": "npm run build-cli && npm run build-lib",
     "build-lib": "tsc --module commonjs && rollup -c rollup.config.ts --bundleConfigAsCjs",
     "build-cli": "tsc src/cli.ts --outDir dist",

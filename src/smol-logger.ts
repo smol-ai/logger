@@ -77,9 +77,9 @@ export class SmolLogger {
     try {
       result = await fnToWrap(...args)
     } catch (err) {
-      console.error('smol logger: error happened while wrapping ' + fnToWrap.name)
+      console.error(this.LOGCOLOR('smol logger') + ': error happened while wrapping ' + fnToWrap.name)
       console.error(err)
-      console.error('smol logger: please doublecheck your API key or call args')
+      console.error(this.LOGCOLOR('smol logger') + ': please doublecheck your API key or call args')
       result = err as any as Error
     } finally {
       const payload = { args } as Record<string, any>

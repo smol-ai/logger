@@ -34,7 +34,7 @@ export class SmolLogger {
     const destination = path.join(this.currentRunDir, `${logName}.json`)
     if (this.logToConsole) console.log(this.LOGCOLOR("🐤 Stored to"), destination);
     const p = loggedLine ? loggedLine.split(':') : ['UNKNOWN', 'UNKNOWN', 'UNKNOWN', 'UNKNOWN']
-    fs.writeFileSync(destination, JSON.stringify({ $callsite: { filePath: p[0] + ':' + p[1], location: p[2] + ':' + p[3]}, $timeElapsed: { sinceStart: secondsSinceStart, sinceLast: secondsSinceLastLog }, $payload: payload, ...args }, getCircularReplacer(), 2));
+    fs.writeFileSync(destination, JSON.stringify({ $callsite: { filePath: p[0] + ':' + p[1], location: p[2] + ':' + p[3]}, $timeElapsed: { sinceStart: secondsSinceStart, sinceLast: secondsSinceLastLog }, $payload: payload, $$payload: payload.toString(), ...args }, getCircularReplacer(), 2));
   }
 
   private _log = (name: string, args: any) => { // arrow fn or else this.* references wont work when called from other files

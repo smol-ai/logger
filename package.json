@@ -1,6 +1,6 @@
 {
   "name": "@smol-ai/logger",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "",
   "keywords": [],
   "main": "dist/smol-logger.umd.js",
@@ -122,6 +122,5 @@
     "tslint-config-standard": "^8.0.1",
     "typescript": "^5.1.3"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }

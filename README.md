@@ -299,17 +299,16 @@ do {
 <img height="400" alt="image" src="https://github.com/smol-ai/logger/assets/6764957/2f15bf5a-a25b-4b69-b7e5-38524beeef70">
 
 > In future we might provide a more official API for nested logging:
-> 
+> (this is in the code but is untested)
 > ```js
-> const sublog = logger.sublog() // a new instance of Logger, with indented log set
+> const sublog = logger.newSubLog('prefix') // a new instance of Logger, with indented log set
 > let temp = 0
 > do {
->   sublog('logname1 here ' + temp, temp)
+>   sublog('logname1 here ' + temp, temp) // everything logged here is one indent in
 >   const sublog2 = sublog.sublog()
 >     let temp2 = 0
 >     do {
->       // everything logged here is two indent in
->       sublog2('logname2 here ' + temp2, temp2)
+>       sublog2('logname2 here ' + temp2, temp2) // everything logged here is two indent in
 >     } while (temp2++ < 5)
 > } while (temp++ < 5)
 > ```

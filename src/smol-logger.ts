@@ -9,6 +9,7 @@ export class SmolLogger {
   logDirectory = '.logs';
   logToConsole = true
   logToStore = true
+  nestingLevel = 0
   currentRunDir = ''
   LOGCOLOR = (str: string) => "\x1b[33m" + str + "\x1b[0m";
   constructor({ logToConsole, logToStore }: { logToConsole: boolean, logToStore: boolean }) {
@@ -63,6 +64,19 @@ export class SmolLogger {
   log = (name: string, args: any) => {
     if (this.logToStore) this.store(this._log(name, args))
     return args
+  }
+  newSubLog = (subLogPrefix = '') => {
+    const _subLog = new SmolLogger({ logToConsole: this.logToConsole, logToStore: this.logToStore })
+    // Copy the values from the current instance to the clone
+    for (let prop in this) {
+      if (this.hasOwnProperty(prop)) {
+        // @ts-ignore TODO: fix type
+        _subLog[prop] = this[prop];
+      }
+    }
+    _subLog.nestingLevel = this.nestingLevel + 1
+    _subLog.logName = (name: string) => `[${subLogPrefix} ${Array(_subLog.nestingLevel).join('  ')}] ${pad(this.counter++, 3)}: ${name}`
+    return _subLog
   }
   asyncLog = async (name: string, args: any) => {
     if (this.logToStore) await this.store(this._log(name, args))

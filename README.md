@@ -44,7 +44,7 @@ use:
 ```js
 import { SmolLogger } from '@smol-ai/logger';
 
-const logger = new SmolLogger(true)
+const logger = new SmolLogger({ logToConsole: true, logToStore: true }) // easy to turn off
 const log = logger.log // optional convenient alias for less verbosity
 
 log('name of log (required)', payload) // basic usage

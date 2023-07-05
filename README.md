@@ -11,6 +11,8 @@ Use your IDE as Logging UI - a fast, simple, extensible, zero dependency Node.js
 
 <img width="1460" alt="image" src="https://github.com/smol-ai/logger/assets/6764957/75b68625-2516-492e-8642-be316d57d5f4">
 
+Short video demo: https://www.loom.com/share/ae818b7d058343c1ad6caf8deee2e430
+
 ## Features
 
 - By default, logs to both the terminal and local json files for easy navigation/versioning

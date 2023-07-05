@@ -178,6 +178,9 @@ await logger.asyncLog('my message here', { foo: 'bar' })
 This logs BOTH input and output of an async function that you want to monitor. Mostly useful for prompt engineering where you really care about input vs output pairs being visible in the same log file.
 
 ```js
+import { Configuration, OpenAIApi } from 'openai';
+const openai = new OpenAIApi(new Configuration({ apiKey: process.env.OPENAI_API_KEY }));
+
 const wrapped = logger.wrap(openai.createChatCompletion.bind(openai)) // binding is impt bc of how OpenAI internally retrieves its config
 const response = await wrapped({
         model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',

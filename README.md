@@ -11,6 +11,8 @@ Use your IDE as Logging UI - a fast, simple, extensible, zero dependency Node.js
 
 <img width="1460" alt="image" src="https://github.com/smol-ai/logger/assets/6764957/75b68625-2516-492e-8642-be316d57d5f4">
 
+Short video demo: https://www.loom.com/share/ae818b7d058343c1ad6caf8deee2e430
+
 ## Features
 
 - By default, logs to both the terminal and local json files for easy navigation/versioning
@@ -178,6 +180,9 @@ await logger.asyncLog('my message here', { foo: 'bar' })
 This logs BOTH input and output of an async function that you want to monitor. Mostly useful for prompt engineering where you really care about input vs output pairs being visible in the same log file.
 
 ```js
+import { Configuration, OpenAIApi } from 'openai';
+const openai = new OpenAIApi(new Configuration({ apiKey: process.env.OPENAI_API_KEY }));
+
 const wrapped = logger.wrap(openai.createChatCompletion.bind(openai)) // binding is impt bc of how OpenAI internally retrieves its config
 const response = await wrapped({
         model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',

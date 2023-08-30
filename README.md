@@ -180,6 +180,46 @@ await logger.asyncLog('my message here', { foo: 'bar' })
 This logs BOTH input and output of an async function that you want to monitor. Mostly useful for prompt engineering where you really care about input vs output pairs being visible in the same log file.
 
 ```js
+import OpenAI from 'openai'; // this is for openai v4 package! v3 instructions below
+import {SmolLogger} from '@smol-ai/logger';
+
+const openai = new OpenAI({
+  apiKey: 'my api key', // defaults to process.env["OPENAI_API_KEY"]
+});
+const logger = new SmolLogger({logToConsole: true, logToStore: true}); // both args are optional, just spelling out defaults for you to easily turn off
+
+const wrapped = logger.wrap(
+  openai.chat.completions.create.bind(openai) // binding is impt bc of how OpenAI internally retrieves its config
+
+async function main() {
+  const completion = await wrapped({
+    model: "gpt-3.5-turbo",
+    messages: [
+      {
+        role: "system",
+        content: "you are a helpful assistant",
+      },
+      {
+        role: "user",
+        content: "Choose a famous pop artist, and give me 3 songs by them",
+      },
+    ],
+  });
+
+  console.log(completion.choices);
+}
+
+main();
+```
+
+<details>
+	<summary>
+		Openai SDK V3 instructions
+	</summary>
+
+will be outdated soon so we hide it here
+
+```js
 import { Configuration, OpenAIApi } from 'openai';
 const openai = new OpenAIApi(new Configuration({ apiKey: process.env.OPENAI_API_KEY }));
 
@@ -190,10 +230,12 @@ const response = await wrapped({
     });
 ```
 
+</details>
+
 Sometimes the output can be very verbose (as is the case with OpenAI chatCompletion). so we also allow you to expose a simple "log transformer" that is an arbitrary function to modify the intercepted output to a format of your choice that you like:
 
 ```js
-// 
+// edit above code to add logTransformer
 const wrapped = logger.wrap(
   openai.createChatCompletion.bind(openai),  // binding is impt bc of how OpenAI internally retrieves its config
   { 
@@ -201,7 +243,7 @@ const wrapped = logger.wrap(
     logTransformer: (args, result) => ({ // can be async
       // ...result, // optional - if you want the full raw result itself
       prompt: args[0].messages,
-      response: result.data.choices[0].message,
+      response: result.choices[0].message, // this is v4 api; was result.data.choices[0].message for v3
     })
   }
 )

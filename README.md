@@ -1,3 +1,7 @@
+> 2024 note: the binding for the logger doesnt work anymore even tho it used to - we don't super know why yet
+> ![image](https://github.com/smol-ai/logger/assets/6764957/fe65dd3b-95f4-4346-92a7-b2bc98b7883b)
+> 
+
 # 🐤 smol logger
 
 **A minimal viable logger for Prompt/LLM App Engineering.** 
